@@ -2,8 +2,6 @@ name: Release Application
 permissions:
   contents: write
 
-
-
 on:
   push:
     branches:
@@ -25,42 +23,49 @@ jobs:
         with:
           version: v3.12.1
 
-      - name: Get Chart Version
-        id: get_version
-        run: |
-          version=$(grep '^version:' my-app/Chart.yaml | awk '{print $2}')
-          echo "VERSION=$version" >> $GITHUB_ENV
-          echo "Detected version: $version"
-
-      - name: Check if Tag Exists
-        id: check_tag
-        run: |
-          if git rev-parse "my-app-${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "Tag my-app-${{ env.VERSION }} already exists."
-            echo "EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "Tag does not exist. Proceeding with release."
-            echo "EXISTS=false" >> $GITHUB_ENV
-          fi
-
-      - name: Create Git Tag
-        if: env.EXISTS == 'false'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "my-app-${{ env.VERSION }}"
-          git push origin "my-app-${{ env.VERSION }}"
-
-      - name: Package Chart
-        if: env.EXISTS == 'false'
-        run: |
-          helm package my-app
-
-      - name: Create GitHub Release
-        if: env.EXISTS == 'false'
-        uses: softprops/action-gh-release@v1
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.7.0
         with:
-          tag_name: my-app-${{ env.VERSION }}
-          files: my-app-${{ env.VERSION }}.tgz
+          charts_dir: .
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+#      - name: Get Chart Version
+#        id: get_version
+#        run: |
+#          version=$(grep '^version:' my-app/Chart.yaml | awk '{print $2}')
+#          echo "VERSION=$version" >> $GITHUB_ENV
+#          echo "Detected version: $version"
+#
+#      - name: Check if Tag Exists
+#        id: check_tag
+#        run: |
+#          if git rev-parse "my-app-${{ env.VERSION }}" >/dev/null 2>&1; then
+#            echo "Tag my-app-${{ env.VERSION }} already exists."
+#            echo "EXISTS=true" >> $GITHUB_ENV
+#          else
+#            echo "Tag does not exist. Proceeding with release."
+#            echo "EXISTS=false" >> $GITHUB_ENV
+#          fi
+#
+#      - name: Create Git Tag
+#        if: env.EXISTS == 'false'
+#        run: |
+#          git config user.name "github-actions[bot]"
+#          git config user.email "github-actions[bot]@users.noreply.github.com"
+#          git tag "my-app-${{ env.VERSION }}"
+#          git push origin "my-app-${{ env.VERSION }}"
+#
+#      - name: Package Chart
+#        if: env.EXISTS == 'false'
+#        run: |
+#          helm package my-app
+#
+#      - name: Create GitHub Release
+#        if: env.EXISTS == 'false'
+#        uses: softprops/action-gh-release@v1
+#        with:
+#          tag_name: my-app-${{ env.VERSION }}
+#          files: my-app-${{ env.VERSION }}.tgz
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
