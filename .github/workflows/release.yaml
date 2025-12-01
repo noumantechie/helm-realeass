@@ -1,20 +1,18 @@
-name: Release Application
-permissions:
-  contents: write
+name: Release Charts
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'my-app/Chart.yaml'
 
 jobs:
   release:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -23,54 +21,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: v3.12.1
-
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
-        with:
-          charts_dir: .
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-#      - name: Get Chart Version
-#        id: get_version
-#        run: |
-#          version=$(grep '^version:' my-app/Chart.yaml | awk '{print $2}')
-#          echo "VERSION=$version" >> $GITHUB_ENV
-#          echo "Detected version: $version"
-#
-#      - name: Check if Tag Exists
-#        id: check_tag
-#        run: |
-#          if git rev-parse "my-app-${{ env.VERSION }}" >/dev/null 2>&1; then
-#            echo "Tag my-app-${{ env.VERSION }} already exists."
-#            echo "EXISTS=true" >> $GITHUB_ENV
-#          else
-#            echo "Tag does not exist. Proceeding with release."
-#            echo "EXISTS=false" >> $GITHUB_ENV
-#          fi
-#
-#      - name: Create Git Tag
-#        if: env.EXISTS == 'false'
-#        run: |
-#          git config user.name "github-actions[bot]"
-#          git config user.email "github-actions[bot]@users.noreply.github.com"
-#          git tag "my-app-${{ env.VERSION }}"
-#          git push origin "my-app-${{ env.VERSION }}"
-#
-#      - name: Package Chart
-#        if: env.EXISTS == 'false'
-#        run: |
-#          helm package my-app
-#
-#      - name: Create GitHub Release
-#        if: env.EXISTS == 'false'
-#        uses: softprops/action-gh-release@v1
-#        with:
-#          tag_name: my-app-${{ env.VERSION }}
-#          files: my-app-${{ env.VERSION }}.tgz
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
