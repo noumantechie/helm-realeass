@@ -3,6 +3,16 @@ entries:
   my-app:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-12-01T11:11:58.885961781Z"
+    description: A Helm chart for Kubernetes
+    digest: ecc28023a7e4c6e78efe94daab1470572a4bb88d5f825b4b61815197af12d360
+    name: my-app
+    type: application
+    urls:
+    - https://github.com/noumantechie/helm-realeass/releases/download/my-app-0.1.6/my-app-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-12-01T11:09:57.611970638Z"
     description: A Helm chart for Kubernetes
     digest: c00bbc0ee9de31942dc09c1ad438eff686398c141d88aa0cd5df22966a2527c7
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://github.com/noumantechie/helm-realeass/releases/download/my-app-0.1.5/my-app-0.1.5.tgz
     version: 0.1.5
-generated: "2025-12-01T11:09:57.611976281Z"
+generated: "2025-12-01T11:11:58.885969836Z"
